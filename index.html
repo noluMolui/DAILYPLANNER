@@ -7,7 +7,41 @@
   <link rel="stylesheet" href="app.css"/>
 </head>
 <body>
-  <div id="app"></div>
+    <div class="container">
+    <h1 id="header"></h1>
+    <div id="usernamePrompt" style="text-align: center">
+      <input id="nameInput" placeholder="Enter your name" />
+      <button onclick="setUsername()">Start</button>
+    </div>
+
+    <div id="app" style="display: none">
+      <div class="section">
+        <input id="taskInput" placeholder="Add a new task" />
+        <button onclick="addTask()">Add Task</button>
+        <div id="taskList"></div>
+      </div>
+
+      <div class="section">
+        <h3>Reflection</h3>
+        <textarea id="reflectionInput" rows="5" placeholder="Write your reflection..."></textarea>
+        <button onclick="saveToday()">Save</button>
+      </div>
+
+      <div class="section history">
+        <h3>View Past Entries</h3>
+        <select id="historySelect" onchange="loadHistory()"></select>
+        <div id="historyContent"></div>
+        <button id="deleteDayBtn" onclick="deleteHistoryDay()">Delete This Day</button>
+      </div>
+
+      <div class="section">
+        <h3>Past 7 Days Summary</h3>
+        <div id="weeklySummary"></div>
+      </div>
+    </div>
+  </div>
+
+
   <script src="script.js"></script>
 </body>
 </html>

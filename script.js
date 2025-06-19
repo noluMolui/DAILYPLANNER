@@ -1,93 +1,145 @@
-const app = document.getElementById("app");
+const today = new Date().toISOString().slice(0, 10);
+    let username = localStorage.getItem('username') || '';
+    let recentlyDeleted = null;
 
-let username = localStorage.getItem("username");
-let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-let reflection = localStorage.getItem("reflection") || "";
+    const app = document.getElementById('app');
+    const prompt = document.getElementById('usernamePrompt');
+    const header = document.getElementById('header');
+    const nameInput = document.getElementById('nameInput');
+    const taskInput = document.getElementById('taskInput');
+    const reflectionInput = document.getElementById('reflectionInput');
+    const taskList = document.getElementById('taskList');
+    const historySelect = document.getElementById('historySelect');
+    const historyContent = document.getElementById('historyContent');
+    const deleteDayBtn = document.getElementById('deleteDayBtn');
 
-function renderApp() {
-  if (!username) {
-    app.innerHTML = `
-      <div class="container">
-        <h2>Welcome! What's your name?</h2>
-        <input id="nameInput" placeholder="Enter your name" />
-        <button onclick="saveName()">Continue</button>
-      </div>
-    `;
-    return;
-  }
+    function setUsername() {
+      username = nameInput.value.trim();
+      if (username) {
+        localStorage.setItem('username', username);
+        init();
+      }
+    }
 
-  app.innerHTML = `
-    <div class="container">
-      <h1>${username}'s Daily Plan</h1>
-      <div>
-        <h3>📝 To-Do List</h3>
-        <input id="taskInput" placeholder="Add a task..." />
-        <button onclick="addTask()">Add</button>
-        <div id="taskList"></div>
-      </div>
-      <div style="margin-top:2rem;">
-        <h3>🌙 Nightly Reflection</h3>
-        <textarea id="reflectionBox" placeholder="How did today go?">${reflection}</textarea>
-      </div>
-    </div>
-  `;
+    function init() {
+      prompt.style.display = 'none';
+      app.style.display = 'block';
+      header.textContent = `${username}'s Daily Plan`;
+      loadToday();
+      loadHistoryOptions();
+      loadWeeklySummary();
+    }
 
-  renderTasks();
+    function loadToday() {
+      const data = JSON.parse(localStorage.getItem(`todo-${today}`)) || { tasks: [], reflection: '' };
+      taskList.innerHTML = '';
+      data.tasks.forEach((task, i) => addTaskElement(task.text, task.done, i));
+      reflectionInput.value = data.reflection;
+    }
 
-  document.getElementById("reflectionBox").addEventListener("input", e => {
-    reflection = e.target.value;
-    localStorage.setItem("reflection", reflection);
-  });
-}
+    function addTask() {
+      const text = taskInput.value.trim();
+      if (text) {
+        addTaskElement(text, false);
+        taskInput.value = '';
+      }
+    }
 
-function saveName() {
-  const input = document.getElementById("nameInput").value.trim();
-  if (input) {
-    username = input;
-    localStorage.setItem("username", username);
-    renderApp();
-  }
-}
+    function addTaskElement(text, done = false, index = null) {
+      const div = document.createElement('div');
+      div.className = 'task' + (done ? ' done' : '');
 
-function addTask() {
-  const input = document.getElementById("taskInput");
-  const text = input.value.trim();
-  if (text) {
-    tasks.push({ text, done: false });
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    input.value = "";
-    renderTasks();
-  }
-}
+      const label = document.createElement('label');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = done;
+      checkbox.onchange = () => {
+        div.classList.toggle('done');
+      };
+      const span = document.createElement('span');
+      span.textContent = text;
 
-function toggleTask(i) {
-  tasks[i].done = !tasks[i].done;
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  renderTasks();
-}
+      label.appendChild(checkbox);
+      label.appendChild(span);
 
-function deleteTask(i) {
-  tasks.splice(i, 1);
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  renderTasks();
-}
+      const del = document.createElement('button');
+      del.textContent = '✕';
+      del.onclick = () => div.remove();
 
-function renderTasks() {
-  const list = document.getElementById("taskList");
-  list.innerHTML = "";
-  tasks.forEach((task, i) => {
-    const item = document.createElement("div");
-    item.className = "todo-item" + (task.done ? " done" : "");
-    item.innerHTML = `
-      <label>
-        <input type="checkbox" ${task.done ? "checked" : ""} onchange="toggleTask(${i})" />
-        <span>${task.text}</span>
-      </label>
-      <button onclick="deleteTask(${i})">✕</button>
-    `;
-    list.appendChild(item);
-  });
-}
+      div.appendChild(label);
+      div.appendChild(del);
+      taskList.appendChild(div);
+    }
 
-renderApp();
+    function saveToday() {
+      const tasks = [];
+      document.querySelectorAll('#taskList .task').forEach(taskEl => {
+        const text = taskEl.querySelector('span').textContent;
+        const done = taskEl.querySelector('input').checked;
+        tasks.push({ text, done });
+      });
+      const reflection = reflectionInput.value;
+      localStorage.setItem(`todo-${today}`, JSON.stringify({ tasks, reflection }));
+      loadHistoryOptions();
+      loadWeeklySummary();
+    }
+
+    function loadHistoryOptions() {
+      historySelect.innerHTML = '<option value="">Select a date</option>';
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('todo-'))
+        .forEach(k => {
+          const date = k.split('todo-')[1];
+          const option = document.createElement('option');
+          option.value = date;
+          option.textContent = date;
+          historySelect.appendChild(option);
+        });
+    }
+
+    function loadHistory() {
+      const date = historySelect.value;
+      const data = JSON.parse(localStorage.getItem(`todo-${date}`));
+      if (data) {
+        historyContent.innerHTML = `<h4>${date}</h4>` +
+          '<ul>' +
+          data.tasks.map(t => `<li>${t.done ? '✔️' : '❌'} ${t.text}</li>`).join('') +
+          '</ul>' +
+          `<p><strong>Reflection:</strong> ${data.reflection}</p>`;
+        deleteDayBtn.style.display = 'inline-block';
+      } else {
+        historyContent.innerHTML = '';
+        deleteDayBtn.style.display = 'none';
+      }
+    }
+
+    function deleteHistoryDay() {
+      const date = historySelect.value;
+      if (date && confirm(`Are you sure you want to delete your entry for ${date}?`)) {
+        recentlyDeleted = {
+          date,
+          data: localStorage.getItem(`todo-${date}`)
+        };
+        localStorage.removeItem(`todo-${date}`);
+        loadHistoryOptions();
+        loadWeeklySummary();
+        historyContent.innerHTML = `<p>Entry for ${date} deleted. <button onclick="undoDelete()">Undo</button></p>`;
+        deleteDayBtn.style.display = 'none';
+      }
+    }
+
+    function undoDelete() {
+      if (recentlyDeleted) {
+        localStorage.setItem(`todo-${recentlyDeleted.date}`, recentlyDeleted.data);
+        loadHistoryOptions();
+        loadWeeklySummary();
+        historySelect.value = recentlyDeleted.date;
+        loadHistory();
+        recentlyDeleted = null;
+      }
+    }
+
+    if (username) {
+      init();
+    }
 

@@ -1,52 +1,67 @@
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #fff0f5;
-  margin: 0;
-  padding: 2rem;
-  color: #333;
-}
-
-.container {
-  max-width: 600px;
-  margin: auto;
-  background: white;
-  padding: 2rem;
-  border-radius: 20px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-
-input, textarea {
-  width: 100%;
-  padding: 0.7rem;
-  margin-top: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-}
-
-button {
-  background: #ff69b4;
-  color: white;
-  border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #e0559e;
-}
-
-.todo-item {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.5rem;
-  background: #ffe4ec;
-  padding: 0.5rem 1rem;
-  border-radius: 10px;
-  align-items: center;
-}
-
-.todo-item.done span {
-  text-decoration: line-through;
-  color: gray;
-}
+body{font-family: sans-serif;
+      background-color: #fff0f5;
+      color: #333;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
+    h1 {
+      text-align: center;
+      color: #d63384;
+    }
+    .section {
+      margin-top: 20px;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #d63384;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 10px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .task {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      background-color: #ffe0ec;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .task.done span {
+      text-decoration: line-through;
+    }
+    .history {
+      margin-top: 20px;
+    }
+    #weeklySummary div {
+      background: #f9f0f4;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+    }
+    #weeklySummary ul {
+      padding-left: 20px;
+    }
+    #deleteDayBtn {
+      display: none;
+      margin-top: 10px;
+      background-color: #dc3545;
+    }
