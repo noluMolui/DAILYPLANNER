@@ -143,3 +143,7 @@ const today = new Date().toISOString().slice(0, 10);
       init();
     }
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js')
+    .then(() => console.log('Service Worker Registered!'));
+}
